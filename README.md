@@ -49,17 +49,20 @@ pip install -r requirements.txt
 
 ### Alternative: install as a Sileo `.deb` (no host machine needed afterward)
 
-Once you have a build (from `build_wda.sh`, on a Mac), package it:
+Prebuilt `.deb`s are published under [Releases](https://github.com/techport-dev/rbserver/releases) — download directly on the device (Safari → the `.deb` link) and tap it, or over SSH:
+
+```sh
+curl -LO https://github.com/techport-dev/rbserver/releases/download/v1.0.0/rbserver_1.0.0_iphoneos-arm64.deb
+sudo dpkg -i rbserver_1.0.0_iphoneos-arm64.deb
+```
+
+To build your own instead (e.g. after making changes), package a fresh build:
 
 ```sh
 ./scripts/build_deb.sh          # -> build/rbserver_1.0.0_iphoneos-arm64.deb
 ```
 
-This packages the app plus an on-device `rbserver` CLI (`start`/`stop`/`status`/`logs`) installed to `/var/jb/usr/local/bin/rbserver`. Transfer the `.deb` to the device (`scp`, AirDrop, Sileo's own "Install .deb from Files" flow, etc.) and either tap it in Sileo/Filza, or over SSH:
-
-```sh
-sudo dpkg -i rbserver_1.0.0_iphoneos-arm64.deb
-```
+Either way, this packages the app plus an on-device `rbserver` CLI (`start`/`stop`/`status`/`logs`) installed to `/var/jb/usr/local/bin/rbserver`.
 
 After that, everything runs **on-device**, no host machine needed:
 
