@@ -45,7 +45,32 @@ pip install -r requirements.txt
 ./scripts/build_wda.sh
 ```
 
-`build_wda.sh` builds WebDriverAgentRunner unsigned, patches in stub Swift-Testing dependencies missing on older iOS targets, writes ad-hoc entitlements, and `ldid`-signs every Mach-O in the bundle. Safe to re-run — it wipes and rebuilds every time.
+`build_wda.sh` builds the WebDriverAgent runner unsigned, renames it to `rbserver.app`/`rbserver.xctest`, patches in stub Swift-Testing dependencies missing on older iOS targets, writes ad-hoc entitlements, and `ldid`-signs every Mach-O in the bundle. Safe to re-run — it wipes and rebuilds every time.
+
+### Alternative: install as a Sileo `.deb` (no host machine needed afterward)
+
+Once you have a build (from `build_wda.sh`, on a Mac), package it:
+
+```sh
+./scripts/build_deb.sh          # -> build/rbserver_1.0.0_iphoneos-arm64.deb
+```
+
+This packages the app plus an on-device `rbserver` CLI (`start`/`stop`/`status`/`logs`) installed to `/var/jb/usr/local/bin/rbserver`. Transfer the `.deb` to the device (`scp`, AirDrop, Sileo's own "Install .deb from Files" flow, etc.) and either tap it in Sileo/Filza, or over SSH:
+
+```sh
+sudo dpkg -i rbserver_1.0.0_iphoneos-arm64.deb
+```
+
+After that, everything runs **on-device**, no host machine needed:
+
+```sh
+rbserver start
+rbserver status
+rbserver stop
+rbserver logs
+```
+
+This doesn't replace `wda_ctl.py` — `install-daemon`/`uninstall-daemon` (background persistence) are still host-orchestrated only, since they need `sudo` handling `wda_ctl.py` already does. The `.deb` is for the common case: get WDA running on-device with nothing but Sileo and a terminal app.
 
 ## Usage
 

@@ -43,7 +43,7 @@ from tidevice import bplist
 REMOTE_DIR_DEFAULT = "/var/mobile/rbserver"
 LOCAL_APP_DEFAULT = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "build/wda/Build/Products/Debug-iphoneos/WebDriverAgentRunner-Runner.app",
+    "build/wda/Build/Products/Debug-iphoneos/rbserver.app",
 )
 DAEMON_LABEL = "com.rbserver.webdriveragent"
 
@@ -57,7 +57,7 @@ DAEMON_LABEL = "com.rbserver.webdriveragent"
 # was running).
 _Q = "'\"'\"'"  # close single-quote, literal double-quoted single-quote, reopen single-quote
 _KILL_WDA_CMD = (
-    "PIDS=$(ps ax -o pid,command | grep WebDriverAgentRunner-Runner | grep -v grep | awk "
+    "PIDS=$(ps ax -o pid,command | grep rbserver.app/rbserver | grep -v grep | awk "
     + _Q + "{print $1}" + _Q + "); "
     'if [ -n "$PIDS" ]; then kill -9 $PIDS; echo KILLED; else echo NOT_RUNNING; fi'
 )
@@ -113,7 +113,7 @@ def _mkdir_p(sftp, remote_dir):
 
 
 def _remote_app(remote_dir):
-    return posixpath.join(remote_dir, "WebDriverAgentRunner-Runner.app")
+    return posixpath.join(remote_dir, "rbserver.app")
 
 
 def _build_xctestconfiguration(remote_app):
@@ -122,7 +122,7 @@ def _build_xctestconfiguration(remote_app):
     rather than reimplementing NSKeyedArchiver's binary-plist format by hand.
     reportResultsToIDE=False is the key change from the normal Appium flow:
     there is no IDE/testmanagerd session behind this launch to report to."""
-    xctest_bundle = posixpath.join(remote_app, "PlugIns/WebDriverAgentRunner.xctest")
+    xctest_bundle = posixpath.join(remote_app, "PlugIns/rbserver.xctest")
     session_identifier = uuid.uuid4()
     xctest_configuration = bplist.XCTestConfiguration({
         "testBundleURL": bplist.NSURL(None, f"file://{xctest_bundle}"),
@@ -140,7 +140,7 @@ def _build_xctestconfiguration(remote_app):
 
 
 def _launch_env(remote_app, port):
-    xctest_bundle = posixpath.join(remote_app, "PlugIns/WebDriverAgentRunner.xctest")
+    xctest_bundle = posixpath.join(remote_app, "PlugIns/rbserver.xctest")
     xctestconfig_path = posixpath.join(remote_app, "session.xctestconfiguration")
     return {
         "CA_ASSERT_MAIN_THREAD_TRANSACTIONS": "0",
@@ -167,7 +167,7 @@ def cmd_deploy(ssh, sftp, args):
     t0 = time.time()
     sftp_put_dir(sftp, args.local_app, remote_app)
     print(f"[deploy] Upload done in {time.time() - t0:.1f}s")
-    run(ssh, f"chmod +x {remote_app}/WebDriverAgentRunner-Runner")
+    run(ssh, f"chmod +x {remote_app}/rbserver")
 
     _, xctestconfig_path = _launch_env(remote_app, args.port)
     print(f"[deploy] Writing {xctestconfig_path} ...")
@@ -182,7 +182,7 @@ def _do_start(ssh, remote_app, port):
     export_lines = "; ".join(f'export {k}="{v}"' for k, v in env.items())
     launch = (
         f"{export_lines}; "
-        f"nohup {remote_app}/WebDriverAgentRunner-Runner "
+        f"nohup {remote_app}/rbserver "
         f"> /tmp/wda_launch.log 2>&1 & echo LAUNCHED_PID=$!; disown"
     )
     return run(ssh, launch)
@@ -277,7 +277,7 @@ def cmd_install_daemon(ssh, sftp, args):
     )
     plist = DAEMON_PLIST_TEMPLATE.format(
         label=DAEMON_LABEL,
-        binary=f"{remote_app}/WebDriverAgentRunner-Runner",
+        binary=f"{remote_app}/rbserver",
         env_entries=env_entries,
     )
 
