@@ -12,8 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install ldid
-        run: brew install ldid
+      - name: Install ldid + dpkg (for .deb packaging)
+        run: brew install ldid dpkg
 
       - name: Install Appium + XCUITest driver (vendors WebDriverAgent source)
         run: |
