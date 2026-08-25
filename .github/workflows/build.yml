@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    permissions:
+      contents: write  # the default GITHUB_TOKEN is otherwise read-only; needed to create/upload releases
     steps:
       - uses: actions/checkout@v4
 
@@ -51,5 +53,5 @@ jobs:
         # missing, or the --clobber upload just fills in the asset if it
         # already exists.
         run: |
-          gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes 2>/dev/null || true
+          gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes || true
           gh release upload "${GITHUB_REF_NAME}" build/*.deb --clobber
