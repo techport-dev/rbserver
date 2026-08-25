@@ -1,0 +1,39 @@
+name: Build rbserver
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ldid
+        run: brew install ldid
+
+      - name: Install Appium + XCUITest driver (vendors WebDriverAgent source)
+        run: |
+          npm install -g appium
+          appium driver install xcuitest
+
+      - name: Build WDA
+        run: ./scripts/build_wda.sh
+
+      - name: Package .deb
+        run: ./scripts/build_deb.sh
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rbserver-deb
+          path: build/*.deb
+
+      - name: Publish to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${GITHUB_REF_NAME}" build/*.deb --clobber
