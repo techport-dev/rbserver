@@ -15,6 +15,9 @@ jobs:
       - name: Install ldid + dpkg (for .deb packaging)
         run: brew install ldid dpkg
 
+      - name: Install Python deps (build_deb.sh imports wda_ctl.py for its bplist encoder)
+        run: pip3 install -r requirements.txt
+
       - name: Install Appium + XCUITest driver (vendors WebDriverAgent source)
         run: |
           npm install -g appium
