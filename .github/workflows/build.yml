@@ -39,4 +39,11 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${GITHUB_REF_NAME}" build/*.deb --clobber
+        # `gh release upload` needs an existing Release object, which a plain
+        # `git tag && git push` doesn't create (confirmed live: "release not
+        # found") -- `gh release create --generate-notes` makes one if it's
+        # missing, or the --clobber upload just fills in the asset if it
+        # already exists.
+        run: |
+          gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes 2>/dev/null || true
+          gh release upload "${GITHUB_REF_NAME}" build/*.deb --clobber
