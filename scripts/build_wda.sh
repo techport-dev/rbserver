@@ -58,7 +58,12 @@ rm -f "$BUILD_DIR/Build/Products"/*.xctestrun
 mv "$APP/WebDriverAgentRunner-Runner" "$APP/rbserver"
 mv "$APP/PlugIns/WebDriverAgentRunner.xctest" "$APP/PlugIns/rbserver.xctest"
 mv "$APP/PlugIns/rbserver.xctest/WebDriverAgentRunner" "$APP/PlugIns/rbserver.xctest/rbserver"
-/usr/libexec/PlistBuddy -c "Set :CFBundleExecutable rbserver" -c "Set :CFBundleName rbserver" -c "Set :CFBundleDisplayName rbserver" -c "Set :CFBundleIdentifier com.rbserver.app" "$APP/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleExecutable rbserver" -c "Set :CFBundleName rbserver" -c "Set :CFBundleIdentifier com.rbserver.app" "$APP/Info.plist"
+# CFBundleDisplayName isn't in the default Info.plist -- PlistBuddy's Set only
+# works on existing keys, Add is needed to create a new one (confirmed live
+# on GitHub Actions' macOS runner: `Set :CFBundleDisplayName` fails with
+# "Does Not Exist" and aborts the whole build under `set -e`).
+/usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string rbserver" "$APP/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleExecutable rbserver" -c "Set :CFBundleName rbserver" -c "Set :CFBundleIdentifier $BUNDLE_ID" "$APP/PlugIns/rbserver.xctest/Info.plist"
 
 echo "[build] Patching missing Swift-Testing-family dependencies (not present on iOS 16)..."
