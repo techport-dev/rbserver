@@ -24,3 +24,6 @@ venv/
 
 # OS cruft
 .DS_Store
+
+# Claude Code's own local session state, not project content
+.claude/
