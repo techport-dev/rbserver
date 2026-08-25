@@ -22,6 +22,17 @@ ENTITLEMENTS="$ROOT/build/entitlements.plist"
 echo "[build] Removing previous build dir..."
 rm -rf "$BUILD_DIR"
 
+# WDA_PROJ is the shared appium-xcuitest-driver-vendored source under
+# node_modules -- npm reinstalling/updating it wipes any edit made here, so
+# this patch is (idempotently) re-applied on every build rather than once.
+# productBundleIdentifier in the same file already reads WDA_PRODUCT_BUNDLE_IDENTIFIER
+# at runtime (see _launch_env in wda_ctl.py) -- only this literal message
+# string has no such override, so it's the one thing that actually needs a
+# source edit rather than an env var.
+echo "[build] Patching WDA source strings (status message)..."
+FB_SESSION_CMDS="$WDA_PROJ/WebDriverAgentLib/Commands/FBSessionCommands.m"
+sed -i '' 's/WebDriverAgent is ready to accept commands/rbserver is ready to accept commands/' "$FB_SESSION_CMDS"
+
 echo "[build] xcodebuild build-for-testing (no signing, ~30-60s)..."
 xcodebuild build-for-testing \
   -project "$WDA_PROJ/WebDriverAgent.xcodeproj" \

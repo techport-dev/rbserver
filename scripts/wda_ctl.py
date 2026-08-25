@@ -149,7 +149,7 @@ def _launch_env(remote_app, port):
         "DYLD_LIBRARY_PATH": f"{remote_app}/Frameworks",
         "NSUnbufferedIO": "YES",
         "SQLITE_ENABLE_THREAD_ASSERTIONS": "1",
-        "WDA_PRODUCT_BUNDLE_IDENTIFIER": "",
+        "WDA_PRODUCT_BUNDLE_IDENTIFIER": "com.rbserver.app",
         "XCTestBundlePath": xctest_bundle,
         "XCTestConfigurationFilePath": xctestconfig_path,
         "XCODE_DBG_XPC_EXCLUSIONS": "com.apple.dt.xctestSymbolicator",

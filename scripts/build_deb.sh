@@ -142,7 +142,7 @@ cmd_start() {
 	export DYLD_LIBRARY_PATH="$APP/Frameworks"
 	export NSUnbufferedIO="YES"
 	export SQLITE_ENABLE_THREAD_ASSERTIONS="1"
-	export WDA_PRODUCT_BUNDLE_IDENTIFIER=""
+	export WDA_PRODUCT_BUNDLE_IDENTIFIER="com.rbserver.app"
 	export XCTestBundlePath="$APP/PlugIns/rbserver.xctest"
 	export XCTestConfigurationFilePath="$APP/session.xctestconfiguration"
 	export XCODE_DBG_XPC_EXCLUSIONS="com.apple.dt.xctestSymbolicator"
