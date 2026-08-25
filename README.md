@@ -52,11 +52,13 @@ pip install -r requirements.txt
 Prebuilt `.deb`s are published under [Releases](https://github.com/techport-dev/rbserver/releases) — download directly on the device (Safari → the `.deb` link) and tap it, or over SSH:
 
 ```sh
-curl -LO https://github.com/techport-dev/rbserver/releases/download/v1.0.0/rbserver_1.0.0_iphoneos-arm64.deb
-sudo dpkg -i rbserver_1.0.0_iphoneos-arm64.deb
+curl -LO https://github.com/techport-dev/rbserver/releases/download/v1.0.1/rbserver_1.0.1_iphoneos-arm64.deb
+sudo dpkg -i rbserver_1.0.1_iphoneos-arm64.deb
 ```
 
-To build your own instead (e.g. after making changes), package a fresh build:
+Releases are built automatically by [GitHub Actions](.github/workflows/build.yml) on macOS runners — pushing a `v*` tag builds WDA, packages it, and publishes the `.deb` to that release, no local Mac required. Push to `main` or trigger the workflow manually to just produce a build artifact without publishing.
+
+To build your own instead (e.g. after making changes), package a fresh build locally:
 
 ```sh
 ./scripts/build_deb.sh          # -> build/rbserver_1.0.0_iphoneos-arm64.deb
@@ -172,7 +174,7 @@ Note the Appium server URL (`127.0.0.1:4723`) and the device's WDA URL (`appium:
 - **`Failure: Unrecognized argument`** at launch — some XCTest/SDK builds reject extra Cocoa launch flags. `wda_ctl.py` no longer passes any; if you're running an older copy, update it.
 - **`start` works but `install-daemon` doesn't** — see the jetsam note under [Usage](#usage).
 - **Procursus shells have no `pgrep`/`pkill`** — `wda_ctl.py` uses `ps` + `awk` + `kill` instead; keep this in mind if you're editing the kill logic.
-- **`/status` still shows `com.facebook.WebDriverAgentRunner` / "WebDriverAgent is ready to accept commands"** — these come from the *compiled binary*, not this repo's scripts. `productBundleIdentifier` reads the `WDA_PRODUCT_BUNDLE_IDENTIFIER` env var at runtime (already set in `wda_ctl.py`/`build_deb.sh`); the status message has no such override, so `build_wda.sh` now patches that one literal in WDA's vendored source before every build. Either way, this only takes effect on a **fresh build** — the published `v1.0.0` `.deb`/binary predates both fixes. Rebuild with `./scripts/build_wda.sh` (on a Mac) to pick them up.
+- **`/status` shows `com.facebook.WebDriverAgentRunner` / "WebDriverAgent is ready to accept commands"** — these come from the *compiled binary*, not this repo's scripts. `productBundleIdentifier` reads the `WDA_PRODUCT_BUNDLE_IDENTIFIER` env var at runtime; the status message has no such override, so `build_wda.sh` patches that one literal in WDA's vendored source before every build. Fixed as of `v1.0.1` — if you're still seeing the old strings, you're on `v1.0.0` or an older local build; grab the latest release or rebuild.
 
 ## License
 
