@@ -27,7 +27,13 @@ jobs:
         run: ./scripts/build_wda.sh
 
       - name: Package .deb
-        run: ./scripts/build_deb.sh
+        # Strip the leading "v" so a v1.0.1 tag produces rbserver_1.0.1_...deb,
+        # matching the release it gets attached to below; build_deb.sh defaults
+        # to 1.0.0 on non-tag builds (push to main, manual dispatch).
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$GITHUB_REF" != refs/tags/* ]]; then VERSION="1.0.0"; fi
+          ./scripts/build_deb.sh "$VERSION"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
